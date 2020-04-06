@@ -1,0 +1,33 @@
+ = User flow: =
+
+welcome screen
+login or new account
+if login:
+    write user name
+    write password
+else if new account:
+    choose user name, check if already used if so: ask for new
+    choose password
+ask for action
+if logout:
+    logout and go back to welcome screen
+
+
+ = When checking valid username and password: =
+
+if login:
+    check if there is such a name
+    if there is:
+        then ask for password
+        if wrong:
+            ask again
+        else:
+            proceed
+    if not:
+        ask to check spelling
+else if new user:
+    check if name is already in use
+    if it is:
+        then ask for new
+
+//INLCUDE NORMALIZE TO CHECK FOR SNEAKY .'s and ..'s!!!!
