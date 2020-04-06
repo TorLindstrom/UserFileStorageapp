@@ -39,7 +39,7 @@ public class UserFileStorageApp {
         private static AtomicInteger counter = new AtomicInteger(0); //used to give unique id's, saved when closing
         private int id; //used for access, not changeable
         private String name; //used for login and user interaction can't be duplicates
-        private char[] password; //well....
+        private char[] password;
 
         private User(String name, char[] password) {
             this.id = counter.getAndIncrement();
@@ -58,6 +58,7 @@ public class UserFileStorageApp {
         }
     }
 
+    //as the program starts, it needs relevant data
     private UserFileStorageApp() {
         readUsers();
         if (users == null) {
@@ -116,7 +117,7 @@ public class UserFileStorageApp {
     }
 
     private void menu() {
-        loop:
+        loop: //loops until exit
         while (true) {
             listEntries();
             System.out.println("Please choose action:\n\t(v)iew\n\t(..) to go back\n\t(s)tart folder\n\t(n)ew\n\t(d)elete\n\t(m)ove\n\t(c)opy\n\tchange (u)ser name\n\t(l)ogout\n\tor\n\t(e)xit");
@@ -160,6 +161,7 @@ public class UserFileStorageApp {
                     logoff();
                     break loop;
                 default:
+                    System.out.println("Invalid command");
             }
         }
     }
@@ -256,6 +258,7 @@ public class UserFileStorageApp {
         delete(path);
     }
 
+    //called for every directory to be looked through and deleted
     private void recursiveDelete(Path path) {
         try {
             String[] entries = path.toFile().list();
@@ -299,6 +302,8 @@ public class UserFileStorageApp {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        currentFolder = target;
+        view(target);
     }
 
     private void move() {
@@ -309,9 +314,10 @@ public class UserFileStorageApp {
         move(path1, path2);
     }
 
+    //called for every directory to be looked through and moved
     private void recursiveMove(Path toBeMoved, Path target) {
         try {
-            Files.copy(toBeMoved, target);
+            Files.copy(toBeMoved, target.resolve(toBeMoved.getFileName()));
             Files.list(toBeMoved).forEach((Path a) ->
             {
                 try {
@@ -319,7 +325,7 @@ public class UserFileStorageApp {
                     if (Files.isDirectory(a)) {
                         recursiveMove(a, subTarget);
                     } else {
-                        Files.move(a, subTarget.resolve(toBeMoved.getFileName()));
+                        Files.move(a, subTarget.resolve(a.getFileName()));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -347,6 +353,8 @@ public class UserFileStorageApp {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        currentFolder = target;
+        view(target);
     }
 
     private void copy() {
@@ -357,9 +365,10 @@ public class UserFileStorageApp {
         copy(path1, path2);
     }
 
+    //called for every directory to be looked through and copied
     private void recursiveCopy(Path toBeCopied, Path target) {
         try {
-            Files.copy(toBeCopied, target);
+            Files.copy(toBeCopied, target.resolve(toBeCopied.getFileName()));
             Files.list(toBeCopied).forEach((Path a) ->
             {
                 try {
@@ -367,7 +376,7 @@ public class UserFileStorageApp {
                     if (Files.isDirectory(a)) {
                         recursiveCopy(a, subTarget);
                     } else {
-                        Files.copy(a, subTarget.resolve(toBeCopied.getFileName()));
+                        Files.copy(a, subTarget.resolve(a.getFileName()));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -453,6 +462,7 @@ public class UserFileStorageApp {
         }
     }
 
+    //check to see that the path doesn't leave the user folder
     private boolean checkValidPath(Path path) {
         path = path.toAbsolutePath().normalize();
         System.out.println("To be validated " + path);
